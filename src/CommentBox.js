@@ -1,5 +1,10 @@
 import React from "react";
-
+import { connect } from "react-redux";
+import {
+  saveComment,
+  fetchCommentsFromRemote,
+  fetchCommentsFromRemoteThunk
+} from "./actions/index";
 class CommentBox extends React.Component {
   state = {
     comment: ""
@@ -9,6 +14,7 @@ class CommentBox extends React.Component {
   }
   onFormSubmit(e) {
     e.preventDefault();
+    this.props.saveComment(this.state.comment);
     this.setState({ comment: "" });
   }
   render() {
@@ -23,10 +29,19 @@ class CommentBox extends React.Component {
             />
           </div>
           <button>Submit</button>
+          <button
+            className="btn"
+            style={{ marginLeft: 10 }}
+            onClick={this.props.fetchCommentsFromRemoteThunk}
+          >
+            Fetch remote
+          </button>
         </form>
       </div>
     );
   }
 }
-
-export default CommentBox;
+export default connect(
+  null,
+  { saveComment, fetchCommentsFromRemote, fetchCommentsFromRemoteThunk }
+)(CommentBox);
