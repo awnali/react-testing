@@ -12,6 +12,7 @@ import { SAVE_COMMENTS, FETCH_COMMENTS } from "../../actions/types";
 // const middlewares = [reduxPromise];
 const middlewares = [thunk, reduxPromise];
 const mockStore = configureMockStore(middlewares);
+const store = mockStore({ comments: [] });
 
 it("returns the correct type and payload", () => {
   const response = saveComment("This is new comment");
@@ -27,19 +28,17 @@ describe("remote comments", () => {
     });
   });
   afterEach(() => {
+    store.clearActions();
     moxios.uninstall();
   });
   it("fetch comments from remote with thunk", done => {
-    const store = mockStore({ comments: [] });
-
     store.dispatch(fetchCommentsFromRemoteThunk()).then(() => {
       expect(store.getActions()[0].type).toEqual(FETCH_COMMENTS);
       done();
     });
   });
   it("fetch comments from remote with redux promise", done => {
-    const store = mockStore({ comments: [] });
-    store.dispatch(fetchCommentsFromRemote()).then(res => {
+    store.dispatch(fetchCommentsFromRemote()).then(() => {
       expect(store.getActions()[0].type).toEqual(FETCH_COMMENTS);
       done();
     });
