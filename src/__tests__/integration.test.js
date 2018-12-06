@@ -4,25 +4,40 @@ import moxios from "moxios";
 import App from "../App";
 import Provider from "../Provider";
 
+let wrapper;
+
 beforeEach(() => {
   moxios.install();
   moxios.stubRequest("http://jsonplaceholder.typicode.com/comments", {
     status: 200,
-    response: ["first comment", "second comment"]
+    response: ["first comment", "second comment", "third comment"]
   });
-});
-it("fetch the comments from remote and update dom", done => {
-  const wrapped = mount(
+  wrapper = mount(
     <Provider>
       <App />
     </Provider>
   );
-  wrapped.find(".btn").simulate("click");
+});
+afterEach(() => {
+  wrapper.unmount();
+});
+it("comments are saving correctly", done => {
+  wrapper
+    .find("textarea")
+    .simulate("change", { target: { value: "afzaal is writing" } });
+  wrapper.update();
+  wrapper.find("form").simulate("submit");
+  wrapper.update();
+  expect(wrapper.find("li").length).toEqual(1);
+  done();
+});
+
+it("comments are pulling from remote", done => {
+  wrapper.find(".btn").simulate("click");
 
   moxios.wait(() => {
-    wrapped.update();
-    expect(wrapped.find("li").length).toEqual(2);
+    wrapper.update();
+    expect(wrapper.find("li").length).toEqual(3);
     done();
-    wrapped.unmount();
   });
 });
